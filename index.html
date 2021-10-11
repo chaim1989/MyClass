@@ -1,0 +1,63 @@
+<html dir="rtl">
+
+<head>
+
+</head>
+
+<body>
+    <h2 id="question_number"></h2>
+    <h1 id="question_text"></h1>
+    <div id="answers">
+
+    </div>
+    <script>
+        const QUESTION_TYPE = {
+            MYULIPLE_CHIOCE: 1,
+            TEXT_INPUT: 2,
+        };
+        window.onload = function () {
+            fetch('/nextQuestion')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById("question_text").innerText = data.question.text;
+                    document.getElementById("question_number").innerText = `שאלה ${data.index} מתוך ` + data.number_of_questions;
+                    document.getElementById("answers").innerHTML = null;
+                    if (data.question.type == QUESTION_TYPE.MYULIPLE_CHIOCE) {
+                        data.question.answers.forEach((answer, index) => {
+                            console.log(answer)
+                            let answers_div = document.getElementById("answers");
+                            var answer_div = document.createElement(`div`);
+                            answer_div.innerHTML = `${index + 1}. ${answer.text}`;
+                            answer_div.setAttribute("id", "answer_" + answer.id);
+                            answer_div.onclick = () => { answerClicked(answer.id) };
+                            answers_div.appendChild(answer_div);
+                        });
+                    } else {
+
+                    }
+
+                });
+
+        }
+        answerClicked = function (clicked_answer) {
+            console.log(clicked_answer);
+            fetch("/post_answer", {
+                method: "POST",
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ answer_id: clicked_answer }),
+
+            }).then(response => {
+                
+                if (response.ok) {
+                    alert("תשובתך נקלטה הינך מועבר לשאלה הבאה!");
+                    location.reload();
+
+                }
+            })
+
+        }
+    </script>
+</body>
+
+
+</html>
