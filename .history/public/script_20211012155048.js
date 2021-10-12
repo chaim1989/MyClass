@@ -1,0 +1,1 @@
+alert("hi im script.js")
